@@ -16,7 +16,7 @@ from verification import start_verification
 import logging as log
 
 # AWS Setup
-log.basicConfig(filename="/var/log/ento/cloud.log", encoding='utf-8', level=log.INFO,filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+log.basicConfig(filename='/var/tmp/cloud.log', filemode='w', level=log.INFO, format='[%(asctime)s]- %(message)s', datefmt='%d-%m-%Y %I:%M:%S %p')
 with open(f"/etc/entomologist/ento.conf",'r') as file:
 	data=json.load(file)
 

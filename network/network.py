@@ -17,10 +17,10 @@ with open(path + "ento.conf",'r') as file:
 def ping():
     # to ping a particular IP
     try:
-		requests.get("https://www.google.com")
-		return True
+        requests.get("https://www.google.com")
+        return True
     except:
-		return False
+        return False
  
  
 def calculate_time(start, stop):
@@ -111,7 +111,7 @@ def main():
             if not ping():
                  
                 # if connection not acquired
-		        subprocess.call(["/usr/sbin/4g/4g.sh"])
+                subprocess.call(["/usr/sbin/4g/4g.sh"])
                 time.sleep(5)
             else:
                  

@@ -8,7 +8,7 @@ import json
 import threading
 import logging as log
 
-log.basicConfig(filename="/var/log/ento/job.log", encoding='utf-8', level=log.INFO,filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+log.basicConfig(filename='/var/tmp/job.log', filemode='w', level=log.INFO, format='[%(asctime)s]- %(message)s', datefmt='%d-%m-%Y %I:%M:%S %p')
 
 now=datetime.now()
 time_stamp=now.strftime("%m/%d/%Y, %H:%M:%S")
