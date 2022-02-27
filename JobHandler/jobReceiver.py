@@ -6,6 +6,9 @@ import os
 import time
 import json
 import threading
+import logging as log
+
+log.basicConfig(filename="/var/log/ento/job.log", encoding='utf-8', level=log.INFO,filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 now=datetime.now()
 time_stamp=now.strftime("%m/%d/%Y, %H:%M:%S")
@@ -40,41 +43,41 @@ def updateData(name,keyValue):
 def on_message(client, userdata, message):
 	
 	jobconfig = json.loads(message.payload.decode('utf-8'))
-	print(f"Job Recieved\n{jobconfig}")
-
+	log.info(f"Job Recieved\n{jobconfig}")
 
 	t_job = threading.Thread(name='parse', target=parse,args=(jobconfig,client))
 	t_job.start()
 
 def parse(jobconfig,client):
-    try:
+	try:
+		if jobconfig['deviceId'] == SERIAL_ID:
+			if 'Device-Test-Flag' in jobconfig['device'] and jobconfig['device']['Device-Test-Flag']=='True':
+				updateData("device",{"TEST_FLAG":"True"})
+				testDuration = jobconfig['device']['Device-Test-Duration']
+				updateData("device",{"TEST_DURATION":testDuration})
 
-        if jobconfig['deviceId'] == SERIAL_ID:
-        	if 'Device-Test-Flag' in jobconfig['device'] and jobconfig['device']['Device-Test-Flag']=='True':
-        		updateData("device",{"TEST_FLAG":"True"})
-        		testDuration = jobconfig['device']['Device-Test-Duration']
-        		updateData("device",{"TEST_DURATION":testDuration})
+			if 'Device-On-Time' in jobconfig['device']:
+				onTime=jobconfig['device']['Device-On-Time']
+				updateData("device",{"ON_TIME":onTime})
 
-        	if 'Device-On-Time' in jobconfig['device']:
-        		onTime=jobconfig['device']['Device-On-Time']
-        		updateData("device",{"ON_TIME":onTime})
-        	if 'Device-Off-Time' in jobconfig['device']:
-        		offTime=jobconfig['device']['Device-Off-Time']
-        		updateData("device",{"OFF_TIME":offTime})
-    except:
-        print("Job Failed!")
+			if 'Device-Off-Time' in jobconfig['device']:
+				offTime=jobconfig['device']['Device-Off-Time']
+				updateData("device",{"OFF_TIME":offTime})
+			log.info("JOB RECIEVED and PARSED Successfully..")
+	except:
+		log.info("Tried to parsed and failed..")
 
 
 
 def on_connect(client, userdata, flags, rc):
 	if rc == 0:
-		print("Job Client Connected")
+		log.info("Job client connected")
 		
 	else:
-		print("Bad connection: Job Client")
+		log.info("Bad connection: Unable to connect")
 
 def start_recieving_job():
-
+	log.info("I have started receiving job..")
 	global jobClient
 
 	jobClient = mqtt.Client(JOB_CLIENT)
@@ -102,7 +105,7 @@ def restart_recieving_job():
 
 	jobClient.disconnect()
 
-	print(f"{'-'*20} Restarting Job Reciever {'-'*20}")
+	log.info(f"{'-'*20} Restarting Job Reciever {'-'*20}")
 
 	time.sleep(3)
 
@@ -110,8 +113,11 @@ def restart_recieving_job():
 
 
 if __name__ == '__main__':
+	log.info("JOB STARTED RUNNING..")
 	while True:
 		try:	
 			start_recieving_job()
 		except:
+			log.error("Something went wrong")
 			time.sleep(5)
+	

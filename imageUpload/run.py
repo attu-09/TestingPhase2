@@ -13,9 +13,10 @@ from sub import start_subscribe
 from pub import start_publish
 from imageUpload import image_upload_manager
 from verification import start_verification
+import logging as log
 
 # AWS Setup
-
+log.basicConfig(filename="/var/log/ento/cloud.log", encoding='utf-8', level=log.INFO,filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 with open(f"/etc/entomologist/ento.conf",'r') as file:
 	data=json.load(file)
 
@@ -67,9 +68,10 @@ def generate_payload(filesList):
 	return json.dumps(payload)
 
 def signed_url_file_exist():
-
+	log.info("Checking for signed URL json file exist")
 	while "signedUrls.json" not in os.listdir():
 		time.sleep(2)
+	log.info("Signed Url file exist")
 	return True
 
 
@@ -77,8 +79,9 @@ def upload_manager(filesList):
 
 	batchSize = len(filesList)
 
+	log.info("Generating for payload")
 	publishPayload = generate_payload(filesList)
-
+	log.info("Payload generated for upload")
 
 	# Create start_subscribe and start_publish as two processes by implementing mulitprocessess.
 	p1 = multiprocessing.Process(target = start_subscribe, args = [
@@ -103,11 +106,13 @@ def upload_manager(filesList):
 		rootCA,
 		cert,
 		privateKey])
-
 	p1.start()
+	log.info("Start Subscribe process started")
 	p2.start()
+	log.info("Start Publish process started")
 	p1.join()
 	p2.join()
+	log.info("Subscribe and publish process finished")
 
 	# Create a better implementation once the signedUrls.json file has been created.
 	if signed_url_file_exist():
@@ -127,10 +132,12 @@ def upload_manager(filesList):
 		p4 = multiprocessing.Process(target = image_upload_manager)
 
 		p3.start()
+		log.info("Start Verification process started")
 		p4.start()
+		log.info("Image Upload manager process started")
 		p3.join()
 		p4.join()
-
+		log.info("Image Upload manager and verification process finished")
 
 		os.remove('signedUrls.json')
 
@@ -146,7 +153,7 @@ def weather():
 	file = open("weather.txt", "a")
 	file.writelines("\n"+tim+" , "+", ".join(str(output)[2:len(output)-1].split("\\n"))+lux+"\n")
 	file.close()
-	time.sleep(3)
+	time.sleep(1)
 
 def weatherupload():
 	filename = "weather.txt"
@@ -158,31 +165,35 @@ def weatherupload():
 			content = f.readlines()
 
 	if os.path.exists(filename):
-		time = str(dt.datetime.now())
-		time = time.replace(" ", "_")
-		string=BUFFER_IMAGES_PATH+"weather_"+time+"_"+DEVICE_SERIAL_ID+".txt"
-		
+		tim = str(time.time())
+		tim = tim.replace(".", "_")
+		string=f"{BUFFER_IMAGES_PATH}weather_{tim}_{DEVICE_SERIAL_ID}.txt"
+
 		file = open(string, "a")
 		file.writelines(content)
 		file.close()
 		os.remove(filename)
 
 def main():
+	log.info("Cloud Main started..")
 	while True:
 		if provisionstatus=="True":
+			log.info("Calling weather writer..")
 			weather()
+			log.info("Weather writer executed..")
 			while len(os.listdir(BUFFER_IMAGES_PATH)):
 				filesList = os.listdir(BUFFER_IMAGES_PATH)[:10]
+				log.info("Calling weather upload..")
 				weatherupload()
+				log.info("Calling upload manager..")
 				upload_manager(filesList)
-			print("waiting...")
+				log.info("Upload manager successfully executed..")
+			log.info("-"*50)
 			time.sleep(1)
 		else:
-			print("waiting...")
+			log.info("I m running but provison status if False")
 			time.sleep(10)
 
 
 
-if __name__ == '__main__':
-
-	main()
+main()

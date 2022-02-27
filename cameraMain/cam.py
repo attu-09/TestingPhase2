@@ -4,7 +4,10 @@ import numpy as np
 import threading
 from datetime import datetime
 import json
+import logging as log
 
+log.basicConfig(filename="/var/log/ento/cam.log", encoding='utf-8', level=log.INFO,filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+log.info("Cam script started..")
 with open(f"/etc/entomologist/ento.conf",'r') as file:
     data=json.load(file)
 
@@ -58,7 +61,7 @@ class MotionRecorder(object):
             video_name = str(now.year) + str(format(now.month,'02d')) + str(format(now.day,'02d')) + str(format(now.hour,'02d')) + str(format(now.minute,'02d')) + str(format(now.second,'02d')) + "_" + DEVICE_SERIAL_ID + ".avi"  
             out = cv2.VideoWriter(BUFFER_IMAGES_PATH+video_name, self.fourcc, self.fps, (640,480))
             print(video_name)
-
+            log.info("Video crealog.info("")ted and saved -> "+video_name)
             for image in self.temp_img_for_video : 
                 out.write(image)
 
@@ -67,6 +70,7 @@ class MotionRecorder(object):
 
 
     def start(self):
+        log.info("Cam started functioning")
         while True :
             available, frame = self.cap.read()
             if available :
@@ -81,5 +85,7 @@ class MotionRecorder(object):
         cv2.destroyAllWindows()
 
 MR = MotionRecorder()
+log.info("Object created")
 MR.start()
 MR.end()
+log.info("Script ended")
