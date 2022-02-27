@@ -10,7 +10,7 @@ while true
 do
     internet_status=$(ping -q -c 1 -W 1 google.com | awk '/received/ {print $4}')
 
-    if [[ $internet_status -eq 1 ]]
+    if [[ $internet_status = 1 ]]
     then
         if [ $led_state = OFF ]
         then
