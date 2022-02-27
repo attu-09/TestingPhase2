@@ -5,7 +5,7 @@ import requests
 import subprocess
 import logging as log
 
-time.sleep(20)
+time.sleep(10)
 log.basicConfig(filename="/var/log/ento/sync.log", encoding='utf-8', level=log.INFO,filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 global scriptStatus
