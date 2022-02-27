@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo 353 > /sys/class/gpio/export
 
