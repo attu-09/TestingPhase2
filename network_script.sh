@@ -8,10 +8,9 @@ echo 0 > /sys/class/gpio/gpio353/value
 led_state=OFF
 while true
 do
-    network_status=$(nmcli -t -f STATE g)
-    internet_status=$(ping google.com | awk '/received/ {print $4}')
+    internet_status=$(ping -q -c 1 -W 1 google.com | awk '/received/ {print $4}')
 
-    if [[ $internet_status = 1 ]]
+    if [[ $internet_status -eq 1 ]]
     then
         if [ $led_state = OFF ]
         then
