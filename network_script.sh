@@ -23,5 +23,6 @@ do
         echo "disconnected"
         led_state=OFF
     fi
+    sleep 3
 done
 
