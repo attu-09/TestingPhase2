@@ -26,6 +26,7 @@ def testDevice(duration):
         #start the services
         subprocess.call(["systemctl","restart","cam"])
         subprocess.call(["systemctl","restart","cloud"])
+        writeInScriptStatus(True)
         log.info("Script restarted successfully of cam and cloud")
     log.info("Device is in testing state now")
     while duration:
