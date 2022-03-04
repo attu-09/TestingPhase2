@@ -6,6 +6,10 @@ import ast
 import time
 from sub import start_subscribe
 
+TOPIC = None
+QoS = None
+PAYLOAD = None
+
 def on_publish(client, userdata, message):
 
 	print("File names published to topic.\n\nDisconnecting from publish client...\n")
@@ -14,12 +18,21 @@ def on_publish(client, userdata, message):
 def on_connect(client, userdata, flags, rc):
 	if rc == 0:
 		print("Publish Client Connected")
+		client.publish(TOPIC, PAYLOAD, QoS)
 		
 	else:
 		print("Bad connection: Publish Client")
 
 
 def start_publish(broker, port, interval, clientName, topic, qos, payload, rootCA, cert, privateKey):
+
+	global TOPIC
+	global QoS
+	global PAYLOAD
+
+	TOPIC = topic
+	QoS = qos
+	PAYLOAD = payload
 
 	time.sleep(3)
 	# AWS Publishing Cient
@@ -33,7 +46,13 @@ def start_publish(broker, port, interval, clientName, topic, qos, payload, rootC
 	pubClient.on_publish = on_publish
 	
 	# Connecting to broker and publishing payload.
-	pubClient.connect(broker, port, interval)
-	pubClient.publish(topic, payload, qos)
+	while True:
+		try:
+			pubClient.connect(broker, port, interval)
+			break
+		except:
+			# Write the loggoing code here.
+			print("I ran in exception: publish")
+	
 
 	pubClient.loop_forever()

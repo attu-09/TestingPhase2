@@ -5,6 +5,8 @@ import json
 import ast
 import time
 
+TOPIC = None
+QoS = None
 
 def on_message(client, userdata, message):
 
@@ -24,12 +26,19 @@ def on_message(client, userdata, message):
 def on_connect(client, userdata, flags, rc):
 	if rc == 0:
 		print("Subscribe Client Connected")
+		client.subscribe(TOPIC, QoS)
 		
 	else:
 		print("Bad connection: Subscribe Client")
 	
 
 def start_subscribe(broker, port, interval, clientName, topic, qos, rootCA, cert, privateKey):
+
+	global TOPIC
+	global QoS
+	
+	TOPIC = topic
+	QoS = qos
 
 	# AWS Subscription Client
 	subClient = mqtt.Client(clientName)
@@ -42,8 +51,11 @@ def start_subscribe(broker, port, interval, clientName, topic, qos, rootCA, cert
 	subClient.on_message = on_message
 
 	# Connecting and Subcribing to topic.
-	subClient.connect(broker, port, interval)
-
-	subClient.subscribe(topic, qos)
+	while True:
+		try:
+			subClient.connect(broker, port, interval)
+			break
+		except:
+			print("I ran in exception: subscribe")
 
 	subClient.loop_forever()

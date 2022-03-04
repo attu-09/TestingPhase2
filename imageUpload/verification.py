@@ -13,6 +13,9 @@ BUFFER_IMAGES_PATH = '/media/mmcblk1p1/'
 uploaded = 0
 batchSize = 0 
 
+TOPIC = None
+QoS = None
+
 def on_message(client, userdata, message):
 	
 	global uploaded
@@ -36,7 +39,7 @@ def on_message(client, userdata, message):
 def on_connect(client, userdata, flags, rc):
 	if rc == 0:
 		print("Verification Client Connected")
-		
+		client.subscribe(TOPIC, QoS)
 	else:
 		print("Bad connection: Verification Client")
 	
@@ -44,6 +47,11 @@ def on_connect(client, userdata, flags, rc):
 def start_verification(broker, port, interval, clientName, topic, qos, batch_size, rootCA, cert, privateKey):
 
 	global batchSize
+	global TOPIC
+	global QoS
+	
+	TOPIC = topic
+	QoS = qos
 	batchSize = batch_size
 
 	# AWS Subscription Client
@@ -57,7 +65,5 @@ def start_verification(broker, port, interval, clientName, topic, qos, batch_siz
 	verifyClient.on_message = on_message
 	# Connecting and Subcribing to topic.
 	verifyClient.connect(broker, port, interval)
-
-	verifyClient.subscribe(topic, qos)
 
 	verifyClient.loop_forever()
