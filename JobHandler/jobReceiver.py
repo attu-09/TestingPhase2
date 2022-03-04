@@ -88,14 +88,14 @@ def start_recieving_job():
 	jobClient.on_message = on_message
 
 	# In case of connection error (due to internet) it will retry to connect.
-	try:
-		jobClient.connect(MQTT_BROKER, PORT, MQTT_KEEP_INTERVAL)
-	except:
-		time.sleep(5)
-		start_recieving_job()
-
-
-	jobClient.subscribe(JOB_TOPIC, QoS)
+	while True:
+		try:
+			jobClient.connect(MQTT_BROKER, PORT, MQTT_KEEP_INTERVAL)
+			break
+		except:
+			log.info("Im in except block of startjob")
+			time.sleep(5)
+			start_recieving_job()
 
 	jobClient.loop_forever()
 
@@ -112,12 +112,6 @@ def restart_recieving_job():
 	start_recieving_job()
 
 
-if __name__ == '__main__':
-	log.info("JOB STARTED RUNNING..")
-	while True:
-		try:	
-			start_recieving_job()
-		except:
-			log.error("Something went wrong")
-			time.sleep(5)
+log.info("JOB STARTED RUNNING..")
+start_recieving_job()
 	

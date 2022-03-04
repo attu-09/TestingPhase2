@@ -145,9 +145,11 @@ def weather():
 	p = subprocess.Popen("/usr/sbin/weather/hts221", stdout=subprocess.PIPE, shell=True) # Use script file instead.
 	tim = str(dt.datetime.now())
 	(output, err) = p.communicate()
-	L = random.randint(400,600)
-	lux = " , Light Intensity : "+str(L)
 	p_status = p.wait()
+	q = subprocess.Popen("/usr/sbin/weather/VEML7700", stdout=subprocess.PIPE, shell=True)
+	(outputL, errL) = p.communicate()
+	lux = ", ".join(str(outputL)[2:len(outputL)-1].split("\\n"))
+	q_status = q.wait()
 	#print("Command output : ", output)
 	#print("Command exit status/return code : ", p_status)
 	file = open("weather.txt", "a")
