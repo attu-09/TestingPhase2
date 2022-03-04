@@ -72,7 +72,7 @@ def parse(jobconfig,client):
 def on_connect(client, userdata, flags, rc):
 	if rc == 0:
 		log.info("Job client connected")
-		
+		client.subscribe(JOB_TOPIC, QoS)
 	else:
 		log.info("Bad connection: Unable to connect")
 
