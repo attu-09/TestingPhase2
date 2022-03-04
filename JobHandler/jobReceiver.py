@@ -95,7 +95,6 @@ def start_recieving_job():
 		except:
 			log.info("Im in except block of startjob")
 			time.sleep(5)
-			start_recieving_job()
 
 	jobClient.loop_forever()
 
