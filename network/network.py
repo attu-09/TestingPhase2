@@ -50,17 +50,17 @@ def first_check():
         # if ping returns true
         live = "\nCONNECTION ACQUIRED\n"
         print(live)
+	device=data['device']["SERIAL_ID"]
         connection_acquired_time = datetime.datetime.now()
         acquiring_message = "connection acquired at: " + str(connection_acquired_time).split(".")[0]
         print(acquiring_message)
-        log = open('/usr/sbin/network/ifconfig.txt', 'w')
+        log = open(f'/usr/sbin/network/ip-{device}.txt', 'w')
         log.write('ifconfig data for device : '+data['device']["SERIAL_ID"]+" at "+ str(connection_acquired_time).split(".")[0]+'\n')
         log.flush()  # <-- here's something not to forget!
         c = subprocess.Popen(['ifconfig'], stdout=log, stderr=log, shell=True)
-        c = subprocess.Popen(['mmcli','-m','0'], stdout=log, stderr=log, shell=True)
-        device=data['device']["SERIAL_ID"]
+        d = subprocess.Popen(['mmcli','-m','0'], stdout=log, stderr=log, shell=True)
         log.close()
-        upload_text_file('/usr/sbin/network/ifconfig.txt')
+        upload_text_file(f'/usr/sbin/network/ip-{device}.txt')
 
         #param={'device':device,'ip':ip}
         #resp=requests.get(url,params=param)
