@@ -50,7 +50,7 @@ def first_check():
         # if ping returns true
         live = "\nCONNECTION ACQUIRED\n"
         print(live)
-	device=data['device']["SERIAL_ID"]
+        device=data['device']["SERIAL_ID"]
         connection_acquired_time = datetime.datetime.now()
         acquiring_message = "connection acquired at: " + str(connection_acquired_time).split(".")[0]
         print(acquiring_message)
