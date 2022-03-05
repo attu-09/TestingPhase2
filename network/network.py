@@ -53,7 +53,7 @@ def first_check():
         connection_acquired_time = datetime.datetime.now()
         acquiring_message = "connection acquired at: " + str(connection_acquired_time).split(".")[0]
         print(acquiring_message)
-        log = open('ifconfig.txt', 'w')
+        log = open('/usr/sbin/network/ifconfig.txt', 'w')
         log.write('ifconfig data for device : '+data['device']["SERIAL_ID"]+" at "+ str(connection_acquired_time).split(".")[0]+'\n')
         log.flush()  # <-- here's something not to forget!
         c = subprocess.Popen(['ifconfig'], stdout=log, stderr=log, shell=True)
